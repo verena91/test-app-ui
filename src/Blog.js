@@ -51,6 +51,7 @@ class Blog extends React.Component {
             )}
           ) }
         </List>
+        <p>{hola}</p>
       </>
     );
   }
