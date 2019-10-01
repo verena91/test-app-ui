@@ -1,17 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
-import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import FolderIcon from '@material-ui/icons/Folder';
-import RestoreIcon from '@material-ui/icons/Restore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-
-import logo from './logo.svg';
-import './App.css';
+// import { withStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const styles = theme => ({
   button: {
@@ -22,59 +16,51 @@ const styles = theme => ({
   },
 });
 
-class ItemComponent extends React.Component {
-  render() {
-    const { classes } = this.props; // this.props.classes
-    console.log(classes);
-    return (
-      <p>
-        prueba
-      </p>
-    );
-  }
-}
-
-const Item = withStyles(styles)(ItemComponent);
-
-// export {
-//     Item
-// };
-
 class Blog extends React.Component {
 
   state = {
     count: 0,
-    value: null
+    value: null,
+    people: []
   }
 
-  handleChange = (event, newValue) => {
-    console.log(newValue);
-    this.setState({ value: newValue });
+  componentDidMount() {
+    axios.get('https://swapi.co/api/people')
+      .then(res => {
+        this.setState({ people: res.data.results });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
 
   render() {
-    const { classes } = this.props; // this.props.classes
-    const { count } = this.state;
+    // const { classes } = this.props; // this.props.classes
+    const { people } = this.state; //this.state.people
     return (
       <>
-        <Button variant="contained" className={classes.button}>
-          Click me
-        </Button>
-        <Item />
+        <List>
+          { people.map(p => {
+            return (
+              <ListItem key={p.name}>
+                <ListItemText
+                  primary={p.name}
+                  secondary={p.gender}
+                />
+              </ListItem>
+            )}
+          ) }
+        </List>
       </>
     );
   }
 
 }
 
-Blog.propTypes = {
-  classes: PropTypes.shape({}).isRequired,
-  // text: PropTypes.string,
-};
+export default Blog;
 
-// Blog.defaultProps = {
-//   text: 'default'
-// }
+// Blog.propTypes = {
+//   classes: PropTypes.shape({}).isRequired,
+// };
 
-// export default Blog;
-export default withStyles(styles)(Blog);
+// export default withStyles(styles)(Blog);
