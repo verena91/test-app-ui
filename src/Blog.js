@@ -51,6 +51,7 @@ class Blog extends React.Component {
             )}
           ) }
         </List>
+        <div>este es un div para que falle el merge</div>
       </>
     );
   }
