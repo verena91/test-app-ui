@@ -1,96 +1,107 @@
 import React from 'react';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+// import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-
-// export default Test;
-// import Test from './test';
-
-// export {
-//   Test,
-//   Test2,
-//   Test3
-// };
-// import { Test as Pepe, Test2, Test3 } from './test';
 
 import logo from './logo.svg';
 import './App.css';
-import Blog from './Blog'; // ejemplo con high order component - withStyles
-// import Topics from './Topic';
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
 
-function Index() {
-  return <h2>Home</h2>;
-}
+import Blog from './components/old/Blog'; // ejemplo con high order component - withStyles
+// import TaskList from './components/tasks/TaskList';
+import TaskList from './components/tasks/TaskListHooks';
+import TaskForm from './components/tasks/TaskForm';
+import TaskForm2 from './components/tasks/TaskForm2';
 
-function About() {
-  return <h2>About</h2>;
-}
+import Home from './components/Home';
+import About from './components/About';
+import Axios from 'axios';
 
-function People() {
-  return <><h2>Star Wars People</h2><Blog/></>;
-}
+import MomentUtils from '@date-io/moment';
+import {
+  MuiPickersUtilsProvider,
+} from '@material-ui/pickers';
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+}));
 
 function Header() {
   return (
-    <ul>
-      <li>
-        <Link to="/">Home</Link>
-      </li>
-      <li>
-        <Link to="/about">About</Link>
-      </li>
-      <li>
-        <Link to="/people">People</Link>
-      </li>
-      <li>
-        <Link to="/topics">Topics</Link>
-      </li>
-    </ul>
+    <h1>ToDo List</h1>
   );
 }
 
-function Topic({ match }) {
+function Menu() {
   return (
-    <div>
-      <h3>{match.params.id}</h3>
-    </div>
+    <MenuList>
+      {/* TODO: En lugar de usar link, usar otra cosa */}
+      <MenuItem><Link to="/">Home</Link></MenuItem>
+      <MenuItem><Link to="/about">About</Link></MenuItem>
+      <MenuItem><Link to="/tasks">Tasks</Link></MenuItem>
+    </MenuList>
   );
 }
 
-function Topics({ match }) {
+// http://localhost:3000/tasks/new
+// http://localhost:3000/tasks/edit/xxxxxxxxx
+
+// const { match } = this.props;
+// match.params.taskId
+
+// Crear componente tasks para mapear las rutas
+function Tasks({ match }) {
   return (
-    <div>
-      <h2>Topics</h2>
-
-      <ul>
-        <li>
-          <Link to={`${match.url}/components`}>Components</Link>
-        </li>
-        <li>
-          <Link to={`${match.url}/props-v-state`}>Props v. State</Link>
-        </li>
-      </ul>
-
-      <Route path={`${match.path}/:id`} component={Topic}/>
-      <Route
-        exact
-        path={match.path}
-        render={() => <h3>Please select a topic.</h3>}
-      />
-    </div>
+    <>
+     <MuiPickersUtilsProvider utils={MomentUtils}>
+        <Route exact path={`${match.path}/new`} component={TaskForm} />
+        <Route
+          exact
+          path={`${match.path}/edit/:taskId`}
+          component={TaskForm}
+        />
+        <Route exact path={`${match.path}/`} component={TaskList} />
+      </MuiPickersUtilsProvider>
+    </>
   );
 }
 
 function App() {
+
+  const classes = useStyles();
   return (
     <Router>
-      <div>
-        <Header/>
-
-        <Route path="/" exact component={Index} />
-        <Route path="/about" component={About} />
-        <Route path="/people" component={People} />
-        <Route path="/topics" component={Topics} />
-
+      <div style={{padding: 30}}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper} style={{ backgroundColor: '#3f51b5', color: 'white'}}>
+              <Header/>
+            </Paper>
+          </Grid>
+          <Grid item xs={2}>
+            <Paper className={classes.paper} style={{ backgroundColor: 'lightgrey'}}>
+              <Menu/>
+            </Paper>
+          </Grid>
+          <Grid item xs={10}>
+            <Paper className={classes.paper} style={{ backgroundColor: 'lightgrey'}}>
+              <Route path="/" exact component={Home} />
+              <Route path="/about" component={About} />
+              {/* Usar componente task, que segun la ruta redirigirá a la lista o al formulario */}
+              <Route path="/tasks" component={Tasks} />
+            </Paper>
+          </Grid>
+        </Grid>
       </div>
     </Router>
   );
